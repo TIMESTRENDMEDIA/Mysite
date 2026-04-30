@@ -1,0 +1,8 @@
+<h2>Downloads 📂</h2>
+
+{% for file in files %}
+    <a href="/files/{{ file }}">{{ file }}</a><br>
+{% endfor %}
+
+<br>
+<a href="/upload">Upload New File</a>
