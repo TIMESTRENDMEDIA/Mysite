@@ -5,26 +5,25 @@ import sqlite3
 app = Flask(__name__)
 app.secret_key = "mysecretkey123"
 
-UPLOAD_FOLDER = 'uploads'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+UPLOAD_FOLDER = "uploads"
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
-# Ensure base upload folder exists
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
+# Ensure uploads folder exists (IMPORTANT for Render)
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 
 # ================= DATABASE =================
 def init_db():
-    conn = sqlite3.connect('users.db')
+    conn = sqlite3.connect("users.db")
     c = conn.cursor()
 
-    c.execute('''
+    c.execute("""
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT UNIQUE,
             password TEXT
         )
-    ''')
+    """)
 
     conn.commit()
     conn.close()
@@ -33,19 +32,19 @@ init_db()
 
 
 # ================= HOME =================
-@app.route('/')
+@app.route("/")
 def home():
-    return render_template('index.html')
+    return render_template("index.html")
 
 
 # ================= SIGNUP =================
-@app.route('/signup', methods=['GET', 'POST'])
+@app.route("/signup", methods=["GET", "POST"])
 def signup():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
 
-        conn = sqlite3.connect('users.db')
+        conn = sqlite3.connect("users.db")
         c = conn.cursor()
 
         try:
@@ -56,19 +55,19 @@ def signup():
 
         conn.close()
 
-        return redirect(url_for('login'))
+        return redirect(url_for("login"))
 
-    return render_template('signup.html')
+    return render_template("signup.html")
 
 
 # ================= LOGIN =================
-@app.route('/login', methods=['GET', 'POST'])
+@app.route("/login", methods=["GET", "POST"])
 def login():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
 
-        conn = sqlite3.connect('users.db')
+        conn = sqlite3.connect("users.db")
         c = conn.cursor()
 
         c.execute("SELECT * FROM users WHERE username=? AND password=?", (username, password))
@@ -77,86 +76,81 @@ def login():
         conn.close()
 
         if user:
-            session['user'] = username
-            return redirect(url_for('home'))
+            session["user"] = username
+            return redirect(url_for("home"))
 
-    return render_template('login.html')
+    return render_template("login.html")
 
 
 # ================= LOGOUT =================
-@app.route('/logout')
+@app.route("/logout")
 def logout():
-    session.pop('user', None)
-    return redirect(url_for('login'))
+    session.pop("user", None)
+    return redirect(url_for("login"))
 
 
-# ================= UPLOAD (PRIVATE) =================
-@app.route('/upload', methods=['GET', 'POST'])
+# ================= UPLOAD (PRIVATE PER USER) =================
+@app.route("/upload", methods=["GET", "POST"])
 def upload():
-    if 'user' not in session:
-        return redirect(url_for('login'))
+    if "user" not in session:
+        return redirect(url_for("login"))
 
-    user_folder = os.path.join(app.config['UPLOAD_FOLDER'], session['user'])
+    user_folder = os.path.join(app.config["UPLOAD_FOLDER"], session["user"])
+    os.makedirs(user_folder, exist_ok=True)
 
-    if not os.path.exists(user_folder):
-        os.makedirs(user_folder)
+    if request.method == "POST":
+        file = request.files["file"]
 
-    if request.method == 'POST':
-        file = request.files['file']
-
-        if file and file.filename != '':
+        if file and file.filename != "":
             filepath = os.path.join(user_folder, file.filename)
             file.save(filepath)
-            return redirect(url_for('download'))
+            return redirect(url_for("download"))
 
-    return render_template('upload.html')
+    return render_template("upload.html")
 
 
-# ================= DOWNLOAD (PRIVATE + SEARCH) =================
-@app.route('/download')
+# ================= DOWNLOAD (WITH SEARCH) =================
+@app.route("/download")
 def download():
-    if 'user' not in session:
-        return redirect(url_for('login'))
+    if "user" not in session:
+        return redirect(url_for("login"))
 
-    user_folder = os.path.join(app.config['UPLOAD_FOLDER'], session['user'])
+    user_folder = os.path.join(app.config["UPLOAD_FOLDER"], session["user"])
+    os.makedirs(user_folder, exist_ok=True)
 
-    if not os.path.exists(user_folder):
-        os.makedirs(user_folder)
-
-    search_query = request.args.get('search', '')
+    search_query = request.args.get("search", "")
 
     files = os.listdir(user_folder)
 
     if search_query:
         files = [f for f in files if search_query.lower() in f.lower()]
 
-    return render_template('download.html', files=files, search=search_query)
+    return render_template("download.html", files=files, search=search_query)
 
 
 # ================= DOWNLOAD FILE =================
-@app.route('/download/<filename>')
+@app.route("/download/<filename>")
 def download_file(filename):
-    if 'user' not in session:
-        return redirect(url_for('login'))
+    if "user" not in session:
+        return redirect(url_for("login"))
 
-    user_folder = os.path.join(app.config['UPLOAD_FOLDER'], session['user'])
-
+    user_folder = os.path.join(app.config["UPLOAD_FOLDER"], session["user"])
     return send_from_directory(user_folder, filename)
 
 
 # ================= DELETE FILE =================
-@app.route('/delete/<filename>')
+@app.route("/delete/<filename>")
 def delete_file(filename):
-    if 'user' not in session:
-        return redirect(url_for('login'))
+    if "user" not in session:
+        return redirect(url_for("login"))
 
-    user_folder = os.path.join(app.config['UPLOAD_FOLDER'], session['user'])
+    user_folder = os.path.join(app.config["UPLOAD_FOLDER"], session["user"])
     file_path = os.path.join(user_folder, filename)
 
     if os.path.exists(file_path):
         os.remove(file_path)
 
-    return redirect(url_for('download'))
+    return redirect(url_for("download"))
 
 
 # ================= RUN APP =================
