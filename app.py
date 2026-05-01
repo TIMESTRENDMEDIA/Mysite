@@ -6,7 +6,6 @@ app = Flask(__name__)
 UPLOAD_FOLDER = "files"
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
-# make sure folder exists
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 
@@ -29,8 +28,8 @@ def download():
 @app.route("/upload", methods=["GET", "POST"])
 def upload():
     if request.method == "POST":
-        file = request.files["file"]
-        if file:
+        file = request.files.get("file")
+        if file and file.filename != "":
             file.save(os.path.join(app.config["UPLOAD_FOLDER"], file.filename))
             return "Upload successful 🚀"
     return render_template("upload.html")
@@ -42,4 +41,5 @@ def get_file(filename):
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
