@@ -1,16 +1,22 @@
+
 body {
     background-color: #f4f4f4;
     text-align: center;
-    font-family: Arial;
+    font-family: Arial, sans-serif;
+    margin: 0;
 }
 
 nav {
     margin: 20px;
 }
 
-a {
+nav a {
     text-decoration: none;
     margin: 10px;
     color: blue;
     font-weight: bold;
+}
+
+nav a:hover {
+    color: darkblue;
 }
