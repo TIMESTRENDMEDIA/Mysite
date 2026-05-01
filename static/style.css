@@ -1,26 +1,16 @@
 body {
-    background: #0f0f0f;
-    color: white;
-    font-family: Arial;
+    background-color: #f4f4f4;
     text-align: center;
-    margin-top: 80px;
+    font-family: Arial;
 }
 
 nav {
-    position: fixed;
-    top: 0;
-    width: 100%;
-    background: #111;
-    padding: 15px;
+    margin: 20px;
 }
 
-nav a {
-    color: white;
-    margin: 10px;
+a {
     text-decoration: none;
+    margin: 10px;
+    color: blue;
     font-weight: bold;
-}
-
-nav a:hover {
-    color: #00ffcc;
 }
