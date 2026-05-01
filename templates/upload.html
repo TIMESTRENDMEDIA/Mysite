@@ -1,8 +1,33 @@
-<h2>Upload File 📤</h2>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
 
-<form method="POST" enctype="multipart/form-data">
-    <input type="file" name="file">
-    <button type="submit">Upload</button>
-</form>
+<body>
 
-<a href="/download">Go to Downloads</a>
+<nav>
+    <a href="/">Home</a>
+    <a href="/about">About</a>
+    <a href="/upload">Upload</a>
+    <a href="/download">Download</a>
+</nav>
+
+<div class="container">
+    <div class="upload-card">
+        <h1>Upload File 📤</h1>
+        <p>Select a file to upload to the server</p>
+
+        <form>
+            <input type="file">
+            <br>
+            <button type="submit">Upload</button>
+        </form>
+
+        <a href="/download">Go to Downloads →</a>
+    </div>
+</div>
+
+</body>
+</html>
