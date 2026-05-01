@@ -43,9 +43,42 @@ p {
     color: #4b5563;
 }
 
-/* OPTIONAL CONTAINER STYLE */
+/* CONTAINER */
 .container {
     max-width: 900px;
     margin: 60px auto;
     padding: 20px;
+}
+
+/* FILE INPUT */
+input[type="file"] {
+    margin: 15px 0;
+    padding: 10px;
+}
+
+/* BUTTON */
+button {
+    background: #111827;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+button:hover {
+    background: #374151;
+}
+
+/* SAFE LINK STYLING (FIXED ERROR) */
+.container a {
+    display: inline-block;
+    margin-top: 15px;
+    color: #2563eb;
+    text-decoration: none;
+}
+
+.container a:hover {
+    text-decoration: underline;
 }
